@@ -1,0 +1,104 @@
+{% extends 'shop/basic.html' %}
+{% block title %}
+Contact Us
+{% endblock %}
+{% block style %}
+{% endblock %}
+
+{% block contactActive %} active {% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h3>Contact Us</h3>
+    <form action="/shop/contact" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" required id="name" name="name" placeholder="Please Enter Your Name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" required id="email" name="email" placeholder="Please Enter Your Email">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" class="form-control" required id="phone" name="phone" placeholder="Please Enter Your Phone Number">
+        </div>
+        <div class="form-group">
+            <label for="desc">How may we help you ?</label>
+            <textarea class="form-control" id="desc" required name="desc" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+
+function updateCart() {
+
+    if (localStorage.getItem('cart') == null) {
+
+        var cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+    } else {
+
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        var sum = 0;
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+        }
+        $('#cart').html(sum);
+
+    }
+
+}
+
+
+function clearCart() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    localStorage.clear();
+    cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+
+}
+
+
+function updatePopover() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var i = 1;
+    var popStr = '';
+    for (var item in cart) {
+        popStr = popStr + '<b>' + i + '. </b>' + cart[item][1] + ' , <b>Qty</b> : ' + cart[item][0] + '<br>';
+        i = i + 1;
+    }
+
+    popStr = popStr + '<br><a href="/shop/checkout"><button class="btn btn-primary"  id="checkout">Checkout</button></a><button class="btn btn-primary mx-1" id="clearCart" onclick="clearCart()">Clear Cart</button>';
+
+
+    $('#popcart').attr('data-content', popStr);
+    $('#popcart').popover('show');
+
+}
+
+
+updateCart();
+updatePopover();
+
+
+{% if isPOSTRequest %}
+
+alert(`Thanks for contacting us. We'll reach you shortly`);
+window.location = '/shop/';
+
+{% endif %}
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,239 @@
+{% extends 'shop/basic.html' %}
+{% block title %}
+Title of Tracker
+{% endblock %}
+{% block style %}
+{% endblock %}
+
+{% block trackerActive %} active {% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="col my-5">
+        <h2>Enter your Order Id and Email Address to track your order</h2>
+
+        <form method="post" action="#" id="trackerForm">
+
+          {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="orderId">Order Id</label>
+                    <input type="text" class="form-control" required id="orderId" name="orderId">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" required id="email" name="email">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Track Order</button>
+        </form>
+
+    </div>
+
+
+    <div class="col my-5">
+        <h2 class="my-5">Order Updates</h2>
+
+        <div class="my-2">   
+            <ul class="list-group" id="items">
+            </ul>
+        </div>
+
+
+
+        <h2 class="my-5">Order Details</h2>
+
+        <div class="my-2">   
+            <ul class="list-group" id="citems">
+            </ul>
+        </div>
+
+
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+function updateCart() {
+
+    if (localStorage.getItem('cart') == null) {
+
+        var cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+    } else {
+
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        var sum = 0;
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+        }
+        $('#cart').html(sum);
+
+    }
+
+}
+
+
+function clearCart() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    localStorage.clear();
+    cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+    $('#items').empty();
+    let string = `<h6>Sorry! There is no item in the cart.</h6>`;
+    $('#items').append(string);
+
+}
+
+
+function updatePopover() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var i = 1;
+    var popStr = '';
+    for (var item in cart) {
+        popStr = popStr + '<b>' + i + '. </b>' + cart[item][1] + ' , <b>Qty</b> : ' + cart[item][0] + '<br>';
+        i = i + 1;
+    }
+
+    popStr = popStr + '<br><a href="/shop/checkout"><button class="btn btn-primary"  id="checkout">Checkout</button></a><button class="btn btn-primary mx-1" id="clearCart" onclick="clearCart()">Clear Cart</button>';
+
+
+    $('#popcart').attr('data-content', popStr);
+    $('#popcart').popover('show');
+
+}
+
+
+updateCart();
+updatePopover();
+
+let string = `<h6>Enter your Order Id and Email Id to get the list of updates</h6>`;
+let string2 = `<h6>Enter your Order Id and Email Id to get the details of your order</h6>`;
+
+$('#items').append(string);
+$('#citems').append(string2);
+
+
+if (localStorage.getItem('cart') == null) {
+
+    var cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+} else {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var sum = 0;
+
+    if (! $.isEmptyObject(cart)) {
+
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+        }
+
+    }
+    $('#cart').html(sum);
+
+}
+
+
+
+//////////// AJAX
+
+
+$('#trackerForm').submit(function(event){
+
+
+    $('#items').empty();  // clearing the items if present
+    $('#citems').empty();
+
+    var formData = {
+
+        'orderId' : $('input[name="orderId"]').val(),
+        'email' : $('input[name="email"]').val(),
+        'csrfmiddlewaretoken' : $('input[name="csrfmiddlewaretoken"]').val()
+
+    };
+
+
+    $.ajax({
+
+        'type' : 'POST',
+        'url' : '/shop/tracker',
+        'data' : formData,
+        'encode' : true,
+
+    }).done(function(data){
+
+        data = JSON.parse(data);
+
+        if(data != {} && data.length > 0)
+        {
+
+            var updates = data[0];
+            
+            for(var i = 0; i < updates.length ; i++)
+            {
+                
+                let string = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                          <h6>${updates[i]['text']}</h6>
+                          <span class="badge badge-primary badge-pill">${updates[i]['time']}</span>
+                      </li>
+              `;
+                $('#items').append(string);
+
+            }
+
+
+            var cart = JSON.parse(data[1]);
+
+             for (var item in cart) {
+
+                        let string = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                  <h6>${cart[item][1]}</h6>
+                                  <span class="badge badge-primary badge-pill">${cart[item][0]}</span>
+                              </li>
+                      `;
+                        $('#citems').append(string);
+
+                    }
+
+        }
+
+        else{
+                let string = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                          <h6>Sorry! No Updates.<h6>
+                          <span class="badge badge-primary badge-pill"></span>
+                      </li>
+              `;
+              let string2 = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                          <h6>Sorry! No Order Details.<h6>
+                          <span class="badge badge-primary badge-pill"></span>
+                      </li>
+              `;
+                $('#items').append(string);       
+                $('#citems').append(string2);       
+        }        
+    
+
+        
+
+    });  /////// end of AJAX function
+
+
+    event.preventDefault();
+
+});    /////////// end of form submit 
+
+
+</script>
+{% endblock %}
+
+

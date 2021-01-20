@@ -1,0 +1,101 @@
+{% extends 'blog/basic.html' %}
+{% block body %}
+<div class="container my-3">
+    <div class="row mb-2">
+        {% for post in myposts %}
+        <div class="col-md-6">
+            <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                <div class="col p-4 d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary">{{ post.title }}</strong>
+                    <h3 class="mb-0">{{ post.head0 }}</h3>
+                    <div class="mb-1 text-muted">{{ post.pub_date }}</div>
+                    <p class="card-text mb-auto">{{ post.chead0 }}</p>
+                    <a href="/blog/blogpost/{{ post.post_id }}">Continue reading</a>
+                </div>
+                <div class="col-auto d-none d-lg-block">
+                    
+                    <img src="/media/{{ post.thumbnail }}" width="200" height="250" aria-label="Placeholder: Thumbnail" />
+                     
+                        
+                </div>
+            </div>
+        </div>
+        {% if forloop.counter|divisibleby:2 and not forloop.counter.last %}
+    </div> <!--      Ending the current slide -->
+    <div class="row mb-2">
+        <!--      Starting a new slide -->
+        {% endif %}
+        {% endfor %}
+        <!--- end of cards ------>
+        <!--- end of slides --->
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js %}
+
+
+<script>
+    
+
+function updateCart() {
+
+    if (localStorage.getItem('cart') == null) {
+
+        var cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+    } else {
+
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        var sum = 0;
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+        }
+        $('#cart').html(sum);
+
+    }
+
+}
+
+
+function clearCart() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    localStorage.clear();
+    cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+
+}
+
+
+function updatePopover() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var i = 1;
+    var popStr = '';
+    for (var item in cart) {
+        popStr = popStr + '<b>' + i + '. </b>' + cart[item][1] + ' , <b>Qty</b> : ' + cart[item][0] + '<br>';
+        i = i + 1;
+    }
+
+    popStr = popStr + '<br><a href="/shop/checkout"><button class="btn btn-primary"  id="checkout">Checkout</button></a><button class="btn btn-primary mx-1" id="clearCart" onclick="clearCart()">Clear Cart</button>';
+
+
+    $('#popcart').attr('data-content', popStr);
+    $('#popcart').popover('show');
+
+}
+
+
+updateCart();
+updatePopover();
+
+
+</script>
+
+{% endblock %}
+

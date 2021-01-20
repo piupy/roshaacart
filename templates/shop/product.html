@@ -1,0 +1,206 @@
+{% extends 'shop/basic.html' %}
+{% block title %}
+{{ prod.product_name }}
+{% endblock %}
+{% block style %}
+{% endblock %}
+{% block body %}
+<br><br>
+<div class="container my-3">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="/media/{{ prod.image }}" alt="Product Image goes here" />
+            <div class="my-2" style="position: absolute; left: 100px">
+            <span id="divpr{{ prod.id }}" class="divpr">
+            <button class="btn btn-primary cart mx-2" id="pr{{ prod.id }}">Add to Cart</button>
+            </span>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <p>{{ prod.product_name }}</p>
+            <p><b>Rs. {{ prod.price }}</b></p>
+            <p>
+                <h6>{{ prod.desc }}</h6>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+
+function updateCart() {
+
+    if (localStorage.getItem('cart') == null) {
+
+        var cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+    } else {
+
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        var sum = 0;
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+        }
+        $('#cart').html(sum);
+
+    }
+
+}
+
+
+
+
+function clearCart() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    for (var item in cart) {
+        var originalButton = `<button id="${item}" class="btn btn-primary cart">Add To Cart</button>`;
+        $('#div' + item).html(originalButton);
+    }
+    localStorage.clear();
+    cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+
+}
+
+
+
+function updatePopover() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var i = 1;
+    var popStr = '';
+    
+    //  var totalPrice = 0;
+
+    for (var item in cart) {
+        
+        popStr = popStr + '<b>' + i + '. </b>' + cart[item][1] + ' , <b>Qty</b> : ' + cart[item][0] + '<br>';
+        i = i + 1;
+
+     //   totalPrice = totalPrice + cart[item][2] * cart[item][0];
+
+    }
+
+    popStr = popStr + '<br><a href="/shop/checkout"><button class="btn btn-primary"  id="checkout">Checkout</button></a><button class="btn btn-primary mx-1" id="clearCart" onclick="clearCart()">Clear Cart</button>';
+
+
+    $('#popcart').attr('data-content', popStr);
+    $('#popcart').popover('show');
+
+//    localStorage.setItem('totalPrice',totalPrice);
+
+}
+
+
+
+
+$('.divpr').on('click', 'button.cart', function() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var idstr = this.id.toString();
+    var qty;
+    var name;
+    if (cart[idstr] != undefined) {
+        cart[idstr][0] = cart[idstr][0] + 1;
+    } else {
+        qty = 1;
+        name = '{{ prod.product_name }}';
+        price = {{ prod.price }};
+        cart[idstr] = [qty, name, price];
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+    var embedString = `<button class="btn btn-primary minus" id="minus${idstr}" > - 
+                          </button> <span id="val${idstr}">${cart[idstr][0]} </span> <button class="btn btn-primary plus" id="plus${idstr}" > + </button>`;
+
+    $('#div' + idstr).html(embedString);
+
+
+}); // end of click
+
+
+
+$('.divpr').on('click', 'button.minus', function() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var key = this.id.slice(5, );
+    cart[key][0] = cart[key][0] - 1;
+    cart[key][0] = Math.max(0, cart[key][0]);
+    $('#val' + key).html(cart[key][0]);
+
+    if(cart[key][0] == 0)
+    {
+        delete cart[key];
+        var embedString = `<button class="btn btn-primary cart mx-2" id="${key}">Add to Cart</button>`; 
+        $('#div' + key).html(embedString);
+    }
+
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+
+});
+
+
+
+
+$('.divpr').on('click', 'button.plus', function() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var key = this.id.slice(4, );
+    cart[key][0] = cart[key][0] + 1;
+    $('#val' + key).html(cart[key][0]);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+
+});
+
+
+
+////////////// Execution
+
+
+if (localStorage.getItem('cart') == null) {
+    var cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+} else {
+    updateCart();
+}
+
+
+    var cart = JSON.parse(localStorage.getItem('cart'));    
+    var idstr = 'pr' + {{ prod.id }};
+    var qty;
+    var name;
+    
+    if(cart[idstr] != undefined)
+    {
+        if(cart[idstr][0] > 0)
+        {
+            var embedString = `<button class="btn btn-primary minus" id="minus${idstr}" > - 
+                              </button> <span id="val${idstr}">${cart[idstr][0]} </span> <button class="btn btn-primary plus" id="plus${idstr}" > + </button>`;        
+        }
+        else{
+            var embedString = `<button class="btn btn-primary cart mx-2" id="${idstr}">Add to Cart</button>`;           
+        }       
+   }
+    
+
+
+    $('#div' + idstr).html(embedString);
+
+
+  updatePopover();
+
+</script>
+{% endblock %}

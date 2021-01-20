@@ -1,0 +1,204 @@
+{% extends 'shop/basic.html' %}
+{% block title %}
+Title of Checkout
+{% endblock %}
+{% block style %}
+{% endblock %}
+
+{% block checkoutActive %} active {% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="col my-5">
+        <h2>Step 1 - Review Your Cart Items</h2>
+        <div>
+            <ul class="list-group" id="items">
+            </ul>
+                
+                <nav aria-label="breadcrumb" class="mt-2">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">
+                    
+                      <span id="showTotal">
+                    </span>
+
+                    </li>
+                    </span>
+                    </li>
+                  </ol>
+                </nav>
+                
+            
+        </div>
+    </div>
+    <div class="col my-5">
+        <h2>Step 2 - Enter Address and Other Details</h2>
+        <form method="post" action="/shop/checkout">
+            {% csrf_token %}
+            <input type="hidden" name="itemsJson" id="itemsJson">
+            <input type="hidden" name="amount" id="amount">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" required id="name" name="name">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" required id="email" name="email">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address">Address Line 1</label>
+                <input type="text" class="form-control" required id="address1" placeholder="Enter Address Line 1" name="address1">
+            </div>
+            <div class="form-group">
+                <label for="address2">Address Line 2</label>
+                <input type="text" class="form-control" id="address2" placeholder="Enter Address Line 2" name="address2">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control" required id="city" name="city">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="state">State</label>
+                    <input type="text" class="form-control" required id="state" name="state">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="zip_code">Zip</label>
+                    <input type="text" class="form-control" required id="zip_code" name="zip_code">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" class="form-control" required id="phone" placeholder="Enter Phone Number" name="phone">
+            </div>
+            <button type="submit" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+
+function updateCart() {
+
+    if (localStorage.getItem('cart') == null) {
+
+        var cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+    } else {
+
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        var sum = 0;
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+        }
+        $('#cart').html(sum);
+
+    }
+
+}
+
+
+function clearCart() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    localStorage.clear();
+    cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+    $('#items').empty();
+    $('#showTotal').html('<h6>Sorry! There is no item in the cart.</h6>');
+
+}
+
+
+function updatePopover() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var i = 1;
+    var popStr = '';
+    for (var item in cart) {
+        popStr = popStr + '<b>' + i + '. </b>' + cart[item][1] + ' , <b>Qty</b> : ' + cart[item][0] + '<br>';
+        i = i + 1;
+    }
+
+    popStr = popStr + '<br><button class="btn btn-primary mx-1 w-100" id="clearCart" onclick="clearCart()">Clear Cart</button>';
+
+
+    $('#popcart').attr('data-content', popStr);
+    $('#popcart').popover('show');
+
+}
+
+
+/////////// Execution
+
+
+if (localStorage.getItem('cart') == null) {
+
+    var cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+} else {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+
+    if($.isEmptyObject(cart))
+    {
+        $('#items').empty();
+        let string = `<h6>Sorry! There is no item in the cart.</h6>`;
+        $('#showTotal').html(string);
+    }
+
+        else
+        {
+                var sum = 0;
+                var totalPrice = 0;
+
+                for (var item in cart) {
+
+                  var qty = cart[item][0];
+                  var name = cart[item][1];
+                  var itemPrice = cart[item][2];
+
+                    sum = sum + qty;
+                    totalPrice = totalPrice + (qty * itemPrice);
+                    let string = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                              ${name}
+                              <span class="badge badge-primary badge-pill">${qty}</span>
+                          </li>
+                  `;
+                    $('#items').append(string);
+                }                 
+
+                $('#amount').val(totalPrice);
+                let totalAmountString = `<pre>Please pay <b>Rs. ${totalPrice}</b> .Thanks for shopping with us.</pre>`;
+                $('#showTotal').html(totalAmountString);
+          
+
+        }
+       
+    }       /// end of else
+
+updateCart();
+updatePopover();
+
+$('#itemsJson').val(localStorage.getItem('cart'));
+
+{% if isOrderPlaced %}
+
+alert(`Thanks for ordering. Your Order Id is  \"{{id}}\" . Use it to track your order.`);
+localStorage.clear();
+window.location = '/shop/';
+
+{% endif %}
+
+
+</script>
+{% endblock %}

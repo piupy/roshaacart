@@ -1,0 +1,216 @@
+{% extends 'blog/basic.html' %}
+
+{% block body %}
+
+
+<div class="container my-3">
+
+<div class="row">
+ 
+    <div class="col-md-8 blog-main">
+      <h3 class="pb-4 mb-4 font-italic border-bottom">
+        {{ post.title }}
+      </h3>
+
+
+        <!-- Facebook Like and Share buttons -->
+
+        <div class="fb-like my-3" data-href="http://127.0.0.1:8000/blog/blogpost/{{ post.post_id }}" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="true"></div>
+
+
+      <div class="blog-post">
+        <h2 class="blog-post-title">{{ post.head0 }}</h2>
+        <p class="blog-post-meta">{{ post.pub_date }} by <a href="#">Rohit Sharma</a></p>
+      
+
+        <p>{{ post.chead0 }}</p>
+
+        <h2>{{ post.head1 }}</h2>
+        <p>{{ post.chead1 }}</p>
+
+
+        <h2>{{ post.head2 }}</h2>
+        <p>{{ post.chead2 }}</p>
+
+
+        <!-- Facebook Comment Plugin -->
+
+        <div class="fb-comments" data-href="http://127.0.0.1:8000/blog/blogpost/{{ post.post_id }}" data-numposts="5" data-width=""></div>
+        
+
+
+      </div><!-- /.blog-post -->
+
+
+<!-- Post Navigators  -->
+
+<div class="my-5" style="padding: 10px" id="postNavigators">
+<pre>
+<a href="#" id="firstPost" onclick="fnFirstPost()"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-skip-backward-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M.5 3.5A.5.5 0 0 0 0 4v8a.5.5 0 0 0 1 0V4a.5.5 0 0 0-.5-.5z"/>
+  <path d="M.904 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.692-1.01-1.233-.696L.904 7.304a.802.802 0 0 0 0 1.393z"/>
+  <path d="M8.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L8.404 7.304a.802.802 0 0 0 0 1.393z"/>
+</svg></a>  <a href="#" id="previousPost" onclick="fnPreviousPost({{ post.post_id }})"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-skip-backward-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  
+  <path d="M.904 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.692-1.01-1.233-.696L.904 7.304a.802.802 0 0 0 0 1.393z"/>
+  <path d="M8.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L8.404 7.304a.802.802 0 0 0 0 1.393z"/>
+</svg></a>                                                                         <a href="#" id="nextPost" onclick="fnNextPost({{ post.post_id }},{{totalPosts }})" ><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-skip-forward-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">  
+
+  <path d="M7.596 8.697l-6.363 3.692C.693 12.702 0 12.322 0 11.692V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+  <path d="M15.096 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+</svg></a>  <a href="#" style="float:right" id="lastPost" onclick="fnLastPost({{ totalPosts }})"><svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-skip-forward-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>
+  <path d="M7.596 8.697l-6.363 3.692C.693 12.702 0 12.322 0 11.692V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+  <path d="M15.096 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+</svg></a>
+</pre>
+</div>
+
+
+
+
+    </div><!-- /.blog-main -->
+
+
+
+
+    <aside class="col-md-4 blog-sidebar">
+      <div class="p-4 mb-3 bg-light rounded">
+        <h4 class="font-italic">About</h4>
+        <p class="mb-0">My Cart is an <em>E-commerce website</em>. You can use it to but and search for items.</p>
+
+
+        <!-- Facebook Share Button -->
+
+        <div class="fb-share-button my-3" data-href="http://127.0.0.1:8000/blog/blogpost/{{ post.post_id }}" data-layout="box_count" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2F127.0.0.1%3A8000%2Fblog%2Fblogpost%2F1&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
+
+
+      </div>
+
+
+      <div class="p-4">
+        <h4 class="font-italic">Contact Us </h4>
+        <ol class="list-unstyled">
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">Facebook</a></li>
+        </ol>
+      </div>
+    </aside><!-- /.blog-sidebar -->
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+  
+
+function fnFirstPost()
+{
+    $('#firstPost').attr('href','/blog/blogpost/' + 1);  
+}
+
+
+function fnLastPost(totalPosts)
+{
+    $('#lastPost').attr('href','/blog/blogpost/' + totalPosts);  
+}
+
+
+function fnPreviousPost(id)
+{
+      if(id > 1)
+        {
+            $('#previousPost').attr('href','/blog/blogpost/' + (id-1));  
+        }
+        else
+        {
+            $('#previousPost').attr('href','/blog/blogpost/' + 1);
+            alert("You can't go beyond the First Post");   
+            event.preventDefault();  
+        }    
+}
+  
+
+function fnNextPost(id,totalPosts)
+{
+  
+  if(id < totalPosts)
+  {
+      $('#nextPost').attr('href','/blog/blogpost/' + (id+1));  
+  }
+  else
+  {
+      $('#nextPost').attr('href','/blog/blogpost/' + 1);
+      alert("You can't go beyond the Last Post");   
+      event.preventDefault();
+  }
+  
+}
+
+
+
+function updateCart() {
+
+    if (localStorage.getItem('cart') == null) {
+
+        var cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+    } else {
+
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        var sum = 0;
+        for (var item in cart) {
+            sum = sum + cart[item][0];
+        }
+        $('#cart').html(sum);
+
+    }
+
+}
+
+
+function clearCart() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    localStorage.clear();
+    cart = {};
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCart();
+    updatePopover();
+
+}
+
+
+function updatePopover() {
+
+    var cart = JSON.parse(localStorage.getItem('cart'));
+    var i = 1;
+    var popStr = '';
+    for (var item in cart) {
+        popStr = popStr + '<b>' + i + '. </b>' + cart[item][1] + ' , <b>Qty</b> : ' + cart[item][0] + '<br>';
+        i = i + 1;
+    }
+
+    popStr = popStr + '<br><a href="/shop/checkout"><button class="btn btn-primary"  id="checkout">Checkout</button></a><button class="btn btn-primary mx-1" id="clearCart" onclick="clearCart()">Clear Cart</button>';
+
+
+    $('#popcart').attr('data-content', popStr);
+    $('#popcart').popover('show');
+
+}
+
+
+updateCart();
+updatePopover();
+
+
+</script>
+
+{% endblock %}
